@@ -11,7 +11,7 @@ from tensorflow.python.eager.context import execution_mode
 
 
 
-stop = set(stopwords.words('english'))
+#stop = set(stopwords.words('english'))
 
 
 def load_data(file_name):
@@ -78,7 +78,7 @@ def gen_dictionaries(file_name):
         for intent in data['intents']:
             for pattern in intent['patterns']:
                 text = remove_punct(pattern)
-                processed_text = remove_stopwords(text)
+                #processed_text = remove_stopwords(text)
                 patterns.append(text)
             classes.append(intent['tag'])
             for response in intent['responses']:

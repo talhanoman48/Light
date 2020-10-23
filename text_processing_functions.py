@@ -71,6 +71,7 @@ def gen_dictionaries(file_name):
         execution_time= toc - tic
         return patterns_counter, patterns, classes, responses, execution_time
     except:
+        tic = time.time()
         patterns = []
         classes = []
         responses = []
@@ -90,7 +91,9 @@ def gen_dictionaries(file_name):
             pickle.dump(patterns_counter, f)
             pickle.dump(responses, f)
         classes = list(sorted(set(classes)))
-        return patterns_counter, patterns, classes, responses
+        toc = time.time()
+        execution_time= toc - tic
+        return patterns_counter, patterns, classes, responses, execution_time
 
 
 def bag_of_words(input, vocab):

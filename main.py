@@ -10,10 +10,26 @@ import streamlit as st
 import time
  
 
+#Add Navigation Menu
+navi = ['Home']
+st.sidebar.selectbox("Navigation", navi)
+
 #initialize list of subjects and make select box in sidebar
-subjects = ["CS", "Statics", "LA", "Islamiat", "train_new"]
-subject = st.sidebar.selectbox("Subject", subjects)
+subjects = ["Fundamentals Of Programming", "Statics", "Linear Algebra", "Islamiat"]
+subject = st.sidebar.selectbox("Subject", subjects, index=0)
+subjs = {
+    "Fundamentals Of Programming": "CS",
+    "Statics":"Statics", 
+    "Linear Algebra": "LA", 
+    "Islamiat": "ISL"
+}
+subject = subjs[subject]
+st.sidebar.header("Settings")
 load_existing = st.sidebar.checkbox("do you want to load existing model".title(), value = True)
+#toggle for debug options
+debug = st.sidebar.checkbox("Enable Debug options".title(), value = False)
+if debug:
+    specific_times = st.sidebar.checkbox("Do you want to see individual execution times for functions".title(), value= False)
 #setup the title and opening statement
 st.title('Light')
 st.write("Your learning companion".title())
@@ -88,7 +104,6 @@ def load_my_model(subject):
     model infrastrucure and weights 
     '''
     model = load_model(subject + ".hd5")
-    model.summary()
     return model
 toc = time.time()
 execution_time.append(toc - tic)
@@ -140,7 +155,6 @@ def predict(input, num_execution, ERR_Threshold):
     input_1 = []
     input_1.append(input)
     seq = tokenizer.texts_to_sequences(input_1)
-    st.write(seq)
     padded = pad_sequences(
         seq, maxlen = max_words, padding="post", truncating="post"
     )
@@ -154,5 +168,7 @@ def predict(input, num_execution, ERR_Threshold):
 
 x = st.text_input(label=f"Enter Your query regarding {subject} below".title())
 predict(x, num_execution, 0.6)
-run_time()
-
+if st.button("Not the Answer You were Looking for?".title()):
+    correct_tag = st.selectbox("Select The Correct Tag", classes)
+if debug:
+    run_time(specific_times)

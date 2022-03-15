@@ -159,6 +159,9 @@ def predict(input, num_execution, ERR_Threshold):
         seq, maxlen = max_words, padding="post", truncating="post"
     )
     prediction = model.predict(padded)
+    st.write(prediction)
+    st.write(np.squeeze(np.argmax(prediction)))
+    st.write(np.sum(prediction))
     if np.max(prediction) > ERR_Threshold:
         st.write(responses[np.squeeze(np.argmax(prediction))])
     toc = time.time()
@@ -170,5 +173,6 @@ x = st.text_input(label=f"Enter Your query regarding {subject} below".title())
 predict(x, num_execution, 0.6)
 if st.button("Not the Answer You were Looking for?".title()):
     correct_tag = st.selectbox("Select The Correct Tag", classes)
+    st.write(correct_tag)
 if debug:
     run_time(specific_times)

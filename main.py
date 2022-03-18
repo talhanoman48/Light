@@ -151,7 +151,7 @@ else:
     #save the model
     model.save(subject + ".hd5")    
 
-def predict(input, num_execution, ERR_Threshold, probabilityDist, maxProbIndex,):
+def predict(input, num_execution, ERR_Threshold):
     '''
     Takes a string and Error Threshold as input and outputs an appropriate respose to the question
 

@@ -33,6 +33,11 @@ if debug:
     probabilityDist = st.sidebar.checkbox("Do you want to see the probability distribution generated?".title(), value= False)
     maxProbIndex = st.sidebar.checkbox("Do you want to see the max probability index?".title(), value= False)
     probSum = st.sidebar.checkbox("Do you want to check the probability sum?".title(), value= False)
+else:
+    specific_times = False
+    probabilityDist = False
+    maxProbIndex = False
+    probSum = False
 #setup the title and opening statement
 st.title('Light')
 st.write("Your learning companion".title())
@@ -146,7 +151,7 @@ else:
     #save the model
     model.save(subject + ".hd5")    
 
-def predict(input, num_execution, ERR_Threshold):
+def predict(input, num_execution, ERR_Threshold, probabilityDist, maxProbIndex,):
     '''
     Takes a string and Error Threshold as input and outputs an appropriate respose to the question
 

@@ -29,7 +29,10 @@ load_existing = st.sidebar.checkbox("do you want to load existing model".title()
 #toggle for debug options
 debug = st.sidebar.checkbox("Enable Debug options".title(), value = False)
 if debug:
-    specific_times = st.sidebar.checkbox("Do you want to see individual execution times for functions".title(), value= False)
+    specific_times = st.sidebar.checkbox("Do you want to see individual execution times for functions?".title(), value= False)
+    probabilityDist = st.sidebar.checkbox("Do you want to see the probability distribution generated?".title(), value= False)
+    maxProbIndex = st.sidebar.checkbox("Do you want to see the max probability index?".title(), value= False)
+    probSum = st.sidebar.checkbox("Do you want to check the probability sum?".title(), value= False)
 #setup the title and opening statement
 st.title('Light')
 st.write("Your learning companion".title())
@@ -159,9 +162,12 @@ def predict(input, num_execution, ERR_Threshold):
         seq, maxlen = max_words, padding="post", truncating="post"
     )
     prediction = model.predict(padded)
-    st.write(prediction)
-    st.write(np.squeeze(np.argmax(prediction)))
-    st.write(np.sum(prediction))
+    if probabilityDist:
+        st.write(prediction)
+    if maxProbIndex:
+        st.write(np.squeeze(np.argmax(prediction)))
+    if probSum:
+        st.write(np.sum(prediction))
     if np.max(prediction) > ERR_Threshold:
         st.write(responses[np.squeeze(np.argmax(prediction))])
     toc = time.time()
@@ -170,7 +176,7 @@ def predict(input, num_execution, ERR_Threshold):
 
 
 x = st.text_input(label=f"Enter Your query regarding {subject} below".title())
-predict(x, num_execution, 0.6)
+predict(x, num_execution, 0.4)
 if st.button("Not the Answer You were Looking for?".title()):
     correct_tag = st.selectbox("Select The Correct Tag", classes)
     st.write(correct_tag)

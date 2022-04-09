@@ -90,7 +90,7 @@ def gen_dictionaries(file_name):
             pickle.dump(classes, f)
             pickle.dump(patterns_counter, f)
             pickle.dump(responses, f)
-        classes = list(sorted(set(classes)))
+        #classes = list(sorted(set(classes)))
         toc = time.time()
         execution_time= toc - tic
         return patterns_counter, patterns, classes, responses, execution_time
@@ -131,3 +131,23 @@ def generate_labels(classes, file_name):
     labels = np.squeeze(np.asarray(labels))
     np.save('Labels/labels'+ file_name, labels)
     return labels
+
+def stemText(patterns, stemmer):
+    '''
+    Stemms the list of sentences and returns the processed list with stemmed words to
+    reduce the size of the vocabulary.
+    '''
+    output = []
+    for pattern in patterns:
+        pattern = pattern.lower()
+        output.append(" ".join([stemmer.lemmatize(i) for i in pattern.split()]))
+    return output
+
+def removeStopwords(patterns, stop_words):
+    '''
+    Removing stop words from list of strings
+    '''
+    filtered_sentences = []
+    for pattern in patterns:
+        filtered_sentences.append(" ".join([w for w in pattern.split() if not w.lower() in stop_words]))
+    return filtered_sentences

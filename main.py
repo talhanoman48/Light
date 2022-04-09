@@ -8,7 +8,12 @@ from tensorflow.keras.models import *
 from tensorflow.keras.preprocessing.text import Tokenizer, tokenizer_from_json
 import streamlit as st
 import time
+from nltk.stem.wordnet import WordNetLemmatizer
  
+ERR_Threshold = 0.65
+max_words = 20
+lem = WordNetLemmatizer()
+stop_words = set(stopwords.words('english'))
 
 #Add Navigation Menu
 navi = ['Home']
@@ -47,7 +52,8 @@ max_words = 20
 execution_time = []
 num_execution = 0
 #generating all the relavent dictionaries
-patterns_counter, patterns, classes, responses,exec_time = gen_dictionaries(subject)
+patterns_counter, patterns, classes, responses,exec_time = gen_dictionaries("CS")
+processedPatterns = stemText(patterns, lem)
 execution_time.append(exec_time)
 labels = generate_labels(file_name=subject, classes=classes)
 num_words = len(patterns_counter)
@@ -71,7 +77,7 @@ def fit_tokenizer(load_exising = False):
     else:
         if subject != "":
             tokenizer = Tokenizer(num_words=num_words, oov_token='UNK')
-            tokenizer.fit_on_texts(patterns)
+            tokenizer.fit_on_texts(processedPatterns)
             tokenizer_json = tokenizer.to_json()
             with io.open(subject + 'tokenizer.json', 'w', encoding='utf-8') as f:
                 f.write(json.dumps(tokenizer_json, ensure_ascii=False))
@@ -79,9 +85,9 @@ def fit_tokenizer(load_exising = False):
 
 
 #initialize and fit the tokenizer or load existing
-tokenizer = fit_tokenizer(load_existing)
+tokenizer = fit_tokenizer(load_exising=load_existing)
 #generate the sequences from the pattern of question previously extracted
-pattern_sequences = tokenizer.texts_to_sequences(patterns)
+pattern_sequences = tokenizer.texts_to_sequences(processedPatterns)
 #padding the sequences to ensure all sequences are of the same length
 pattern_sequences_padded = pad_sequences(
     pattern_sequences, maxlen=max_words, padding="post", truncating="post"
@@ -125,8 +131,12 @@ def createModel():
     #initializing the model
     inputs = Input(shape = (max_words,))
     #Configure Layers of the model
-    X = Embedding(num_words, 100, input_length=max_words, name= "embedding")(inputs)
-    X = LSTM(64, dropout=0.3, name= "LSTM")(X)
+    X = Embedding(num_words, 32, input_length=max_words, name= "embedding")(inputs)
+    X = Conv1D(kernel_size=5, filters=8, name= "CNN1", activation='relu')(X)
+    X = MaxPool1D(pool_size=2, padding='same')(X)
+    X = Conv1D(kernel_size=2, filters=16, name= "CNN2", activation='relu')(X)
+    X = MaxPool1D(pool_size=2, padding='same')(X)
+    X = Flatten()(X)
     outputs = Dense(labels.shape[1], activation="softmax", name="outputs")(X)
     #selecting the optimizer (Adam with default parameters i.e, learning_rate = 0.001, beta1 (momentum)= 0.9, beta2(RMSprop)= 0.999, epsilon= 1e-7)
     optimizer = Adam()
@@ -147,7 +157,7 @@ else:
     #print the summary of the model to make sure every dimension is accounted for
     model.summary()
     #fit the model (number epochs intentionally kept low to prevent overfitting of the model)
-    model.fit(x=pattern_sequences_padded, y=labels, batch_size=32, epochs=600)
+    model.fit(x=pattern_sequences_padded, y=labels, batch_size=16, epochs=100)
     #save the model
     model.save(subject + ".hd5")    
 
@@ -161,8 +171,9 @@ def predict(input, num_execution, ERR_Threshold):
     '''
     tic = time.time()
     input_1 = []
-    input_1.append(input)
-    seq = tokenizer.texts_to_sequences(input_1)
+    input_1.append(input.lower())
+    processedInput = stemText(input_1, lem)
+    seq = tokenizer.texts_to_sequences(processedInput)
     padded = pad_sequences(
         seq, maxlen = max_words, padding="post", truncating="post"
     )

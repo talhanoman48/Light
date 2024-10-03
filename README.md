@@ -3,9 +3,7 @@ Light is a chatbot that aims to help computer science students in need of assist
 
 ## Features
 Light uses a CNN-based architecture to classify user intent and respond to the queries. The architecture is defined in the *main.py* file.
-Light is trained on a large dataset of computer science questions and answers collected from various sources, such as Stack Overflow, Quora, Reddit, etc.
-Light can handle multiple types of questions, such as factual, conceptual, procedural, or opinion-based.
-Light can also evaluate and critique the students’ code snippets and provide constructive feedback and best practices.
+Light is trained on a large dataset of computer science questions and answers.
 ## Installation
 To use Light, you need to install the following dependencies:
 <ul>
